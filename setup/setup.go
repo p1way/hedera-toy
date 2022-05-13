@@ -35,6 +35,19 @@ func main() {
 	client := hedera.ClientForTestnet()
 	client.SetOperator(myAccountId, myPrivateKey)
 
+	//Create the account balance query
+	query := hedera.NewAccountBalanceQuery().
+		SetAccountID(myAccountId)
+
+	//Sign with client operator private key and submit the query to a Hedera network
+	accountBalance, err := query.Execute(client)
+	if err != nil {
+		panic(err)
+	}
+
+	//Print the balance of tinybars
+	fmt.Println("My account balance is ", accountBalance.Hbars)
+
 	//Generate new keys for the account you will create
 	newAccountPrivateKey, err := hedera.PrivateKeyGenerateEd25519()
 
@@ -67,11 +80,11 @@ func main() {
 	fmt.Printf("The account creation tx ID is %v\n", txId)
 
 	//Create the account balance query
-	query := hedera.NewAccountBalanceQuery().
+	query = hedera.NewAccountBalanceQuery().
 		SetAccountID(newAccountId)
 
 	//Sign with client operator private key and submit the query to a Hedera network
-	accountBalance, err := query.Execute(client)
+	accountBalance, err = query.Execute(client)
 	if err != nil {
 		panic(err)
 	}
@@ -81,8 +94,8 @@ func main() {
 
 	//Transfer hbar from your testnet account to the new account
 	transaction := hedera.NewTransferTransaction().
-		AddHbarTransfer(myAccountId, hedera.HbarFrom(-1000, hedera.HbarUnits.Tinybar)).
-		AddHbarTransfer(newAccountId, hedera.HbarFrom(1000, hedera.HbarUnits.Tinybar))
+		AddHbarTransfer(myAccountId, hedera.HbarFrom(-100, hedera.HbarUnits.Hbar)).
+		AddHbarTransfer(newAccountId, hedera.HbarFrom(100, hedera.HbarUnits.Hbar))
 
 		//Submit the transaction to a Hedera network
 	txResponse, err := transaction.Execute(client)
